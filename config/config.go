@@ -20,15 +20,15 @@ import (
 
 var (
 	ApiId               = getEnvInt32("API_ID", 14050586)
-	ApiHash             = os.Getenv("API_HASH","42a60d9c657b106370c79bb0a8ac560c")
+	ApiHash             = getEnv("API_HASH", "42a60d9c657b106370c79bb0a8ac560c")
 	Token               = os.Getenv("TOKEN")
 	DlBotToken          = os.Getenv("DL_BOT_TOKEN")
 	SessionStrings      = getSessionStrings("STRING", 10)
 	SessionType         = getEnv("SESSION_TYPE", "pyrogram")
-	MongoUri            = os.Getenv("MONGO_URI","mongodb+srv://Krishna:pss968048@cluster0.4rfuzro.mongodb.net/?retryWrites=true&w=majority")
+	MongoUri             = getEnv("MONGO_URI", "mongodb+srv://Krishna:pss968048@cluster0.4rfuzro.mongodb.net/?retryWrites=true&w=majority")
 	DbName              = getEnv("DB_NAME", "Rishu")
 	ApiUrl              = getEnv("API_URL", "https://api.onegrab.fun")
-	ApiKey              = os.Getenv("API_KEY","2ee7d4_8M4y8czr85trcf3Ukl-Dn5bySkC9cf5E")
+	ApiKey              = getEnv("API_KEY", "2ee7d4_8M4y8czr85trcf3Ukl-Dn5bySkC9cf5E")
 	OwnerId             = getEnvInt64("OWNER_ID", 5738579437)
 	LoggerId            = getEnvInt64("LOGGER_ID", -1001992970818)
 	Proxy               = os.Getenv("PROXY")
@@ -59,6 +59,7 @@ func init() {
 			if idStr == "" {
 				continue
 			}
+
 			if id, err := strconv.ParseInt(idStr, 10, 64); err == nil {
 				DEVS = append(DEVS, id)
 			} else {
@@ -86,53 +87,65 @@ func init() {
 			slog.Error("Failed to create temp dir for cookies", "error", err)
 			os.Exit(1)
 		}
+
 		go saveAllCookies(cookiesUrl)
 	}
 }
 
-// getEnv returns the value of an environment variable or a default value if it is not set
+// getEnv returns the value of an environment variable
+// or a default value if it is not set.
 func getEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
 	}
+
 	return defaultValue
 }
 
-// getEnvInt64 returns the value of an environment variable as an int64 or a default value if it is not set
+// getEnvInt64 returns the value of an environment variable
+// as an int64 or a default value if it is not set.
 func getEnvInt64(key string, defaultValue int64) int64 {
 	if value, err := strconv.ParseInt(os.Getenv(key), 10, 64); err == nil {
 		return value
 	}
+
 	return defaultValue
 }
 
-// getEnvInt32 gets environment variable as int32 with default value
+// getEnvInt32 gets environment variable as int32
+// with a default value.
 func getEnvInt32(key string, defaultValue int32) int32 {
 	if value, err := strconv.ParseInt(os.Getenv(key), 10, 32); err == nil {
 		return int32(value)
 	}
+
 	return defaultValue
 }
 
-// getEnvBool gets environment variable as bool with default value
+// getEnvBool gets environment variable as bool
+// with a default value.
 func getEnvBool(key string, defaultValue bool) bool {
 	if val, err := strconv.ParseBool(os.Getenv(key)); err == nil {
 		return val
 	}
+
 	return defaultValue
 }
 
-// getSessionStrings gets session strings from environment variable with prefix
+// getSessionStrings gets session strings from environment
+// variable with prefix.
 func getSessionStrings(prefix string, max int) []string {
 	var sessions []string
+
 	for i := 1; i <= max; i++ {
 		key := fmt.Sprintf("%s%d", prefix, i)
+
 		if session := os.Getenv(key); session != "" {
 			sessions = append(sessions, session)
 		}
 	}
 
-	// Also check for non-numbered version
+	// Also check for non-numbered version.
 	if session := os.Getenv(prefix); session != "" {
 		sessions = append(sessions, session)
 	}
@@ -140,46 +153,82 @@ func getSessionStrings(prefix string, max int) []string {
 	return sessions
 }
 
-// processCookieURLs processes comma-separated cookie URLs
+// processCookieURLs processes comma-separated cookie URLs.
 func processCookieURLs(urls string) []string {
 	if urls == "" {
 		return nil
 	}
+
 	var result []string
+
 	for _, url := range strings.Split(urls, ",") {
 		url = strings.TrimSpace(url)
+
 		if url != "" {
 			result = append(result, url)
 		}
 	}
+
 	return result
 }
 
-// containsInt checks if a slice contains a specific int64 value
+// containsInt checks if a slice contains a specific int64 value.
 func containsInt(slice []int64, val int64) bool {
 	for _, item := range slice {
 		if item == val {
 			return true
 		}
 	}
+
 	return false
 }
 
-// validate validates the configuration
+// validate validates the configuration.
 func validate() error {
 	required := []struct {
 		name  string
 		value string
 		check func() bool
 	}{
-		{"API_ID", fmt.Sprintf("%d", ApiId), func() bool { return ApiId > 0 }},
-		{"API_HASH", ApiHash, func() bool { return ApiHash != "" }},
-		{"TOKEN", Token, func() bool { return Token != "" }},
-		{"MONGO_URI", MongoUri, func() bool { return MongoUri != "" }},
-		{"OWNER_ID", fmt.Sprintf("%d", OwnerId), func() bool { return OwnerId > 0 }},
+		{
+			"API_ID",
+			fmt.Sprintf("%d", ApiId),
+			func() bool {
+				return ApiId > 0
+			},
+		},
+		{
+			"API_HASH",
+			ApiHash,
+			func() bool {
+				return ApiHash != ""
+			},
+		},
+		{
+			"TOKEN",
+			Token,
+			func() bool {
+				return Token != ""
+			},
+		},
+		{
+			"MONGO_URI",
+			MongoUri,
+			func() bool {
+				return MongoUri != ""
+			},
+		},
+		{
+			"OWNER_ID",
+			fmt.Sprintf("%d", OwnerId),
+			func() bool {
+				return OwnerId > 0
+			},
+		},
 	}
 
 	var missing []string
+
 	for _, req := range required {
 		if !req.check() {
 			missing = append(missing, req.name)
@@ -187,26 +236,37 @@ func validate() error {
 	}
 
 	if len(missing) > 0 {
-		return fmt.Errorf("missing required configuration: %s", strings.Join(missing, ", "))
+		return fmt.Errorf(
+			"missing required configuration: %s",
+			strings.Join(missing, ", "),
+		)
 	}
 
 	if len(SessionStrings) == 0 {
-		return fmt.Errorf("at least one session string (STRING1–10) is required")
+		return fmt.Errorf(
+			"at least one session string (STRING1–10) is required",
+		)
 	}
 
 	if !isValidService(DefaultService) {
 		DefaultService = "youtube"
-		slog.Info("Invalid DEFAULT_SERVICE, defaulting to 'youtube'", "Service", DefaultService)
+
+		slog.Info(
+			"Invalid DEFAULT_SERVICE, defaulting to 'youtube'",
+			"Service",
+			DefaultService,
+		)
 	}
 
 	return nil
 }
 
-// isValidService checks if the service is valid
+// isValidService checks if the service is valid.
 func isValidService(service string) bool {
 	validServices := map[string]bool{
 		"youtube": true,
 		"spotify": true,
 	}
+
 	return validServices[strings.ToLower(service)]
 }
