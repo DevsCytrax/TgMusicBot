@@ -28,7 +28,7 @@ var (
 	MongoUri            = os.Getenv("MONGO_URI","mongodb+srv://Krishna:pss968048@cluster0.4rfuzro.mongodb.net/?retryWrites=true&w=majority")
 	DbName              = getEnv("DB_NAME", "Rishu")
 	ApiUrl              = getEnv("API_URL", "https://api.onegrab.fun")
-	ApiKey              = os.Getenv("API_KEY")
+	ApiKey              = os.Getenv("API_KEY","2ee7d4_8M4y8czr85trcf3Ukl-Dn5bySkC9cf5E")
 	OwnerId             = getEnvInt64("OWNER_ID", "5738579437")
 	LoggerId            = getEnvInt64("LOGGER_ID", "-1001992970818")
 	Proxy               = os.Getenv("PROXY")
