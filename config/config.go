@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	ApiId               = getEnvInt32("API_ID", "14050586")
+	ApiId               = getEnvInt32("API_ID", 14050586)
 	ApiHash             = os.Getenv("API_HASH","42a60d9c657b106370c79bb0a8ac560c")
 	Token               = os.Getenv("TOKEN")
 	DlBotToken          = os.Getenv("DL_BOT_TOKEN")
